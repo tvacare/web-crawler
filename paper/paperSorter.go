@@ -1,4 +1,4 @@
-package main
+package paper
 
 import "sort"
 
@@ -33,4 +33,14 @@ func (s *paperSorter) Swap(i, j int) {
 // Less is part of sort.Interface. It is implemented by calling the "by" closure in the sorter.
 func (s *paperSorter) Less(i, j int) bool {
 	return s.by(&s.papers[i], &s.papers[j])
+}
+
+// Sort papers by marketValue
+var marketValue = func(p1, p2 *Paper) bool {
+	return p1.MarketValue < p2.MarketValue
+}
+
+// DescMarketValue Sort papers by marketValue in descending order
+var DescMarketValue = func(p1, p2 *Paper) bool {
+	return marketValue(p2, p1)
 }

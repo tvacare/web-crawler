@@ -1,0 +1,22 @@
+version: '2.1'
+services:
+  mysql:
+    image: mysql
+    container_name: mysql
+    ports:
+      - 3306:3306
+    env_file: .env.local
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
+      timeout: 20s
+      retries: 10
+
+  app:
+    image: web-crawler
+    container_name: web-crawler
+    env_file: .env.local
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      - MYSQL_HOST=mysql:3306

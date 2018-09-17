@@ -1,6 +1,7 @@
 # WebCrawler 🕷️
 
 WebCrawler para verificar os papéis da bolsa de valores e ordena os 10 primeiros de acordo com os valores de mercado:
+
 - www.fundamentus.com.br
 
 ## Running:
@@ -8,8 +9,12 @@ WebCrawler para verificar os papéis da bolsa de valores e ordena os 10 primeiro
 - make build
 - make start
 
-Make sure you have docker installed
+## Stopping the containers:
+
+- make stop
+
+\*Make sure you have docker installed
 
 ## Author
-* **Thiago Vacare**
 
+- **Thiago Vacare**

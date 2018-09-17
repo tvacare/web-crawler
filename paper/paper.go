@@ -1,4 +1,4 @@
-package main
+package paper
 
 import (
 	"errors"
@@ -14,20 +14,20 @@ var properties = []string{"Papel", "Empresa", "Valor de mercado"}
 
 // Paper represents a company Paper
 type Paper struct {
-	name           string
-	company        string
-	marketValue    float64
-	dailyVariation string
-	url            string
+	Name           string
+	Company        string
+	MarketValue    float64
+	DailyVariation string
+	URL            string
 }
 
-// Get Paper information such as: name, company, marketValue, dailyVariation
+// GetInformation Get Paper information such as: name, company, marketValue, dailyVariation
 // @Returning [] Paper {struct} || error err
 // func getInformation(url string, c chan Paper) {
-func getInformation(url string) Paper {
+func GetInformation(url string) Paper {
 	httpClient := &http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			// return http.ErrUseLastResponse
+			fmt.Printf("%s - %v\n", url, req.Response.Status)
 			return errors.New(req.Response.Status)
 		},
 	}
@@ -36,8 +36,7 @@ func getInformation(url string) Paper {
 
 	resp, err := httpClient.Get(url)
 	if err != nil {
-		fmt.Println(err)
-		p.url = url
+		p.URL = url
 		// c <- *p
 		return *p
 	}
@@ -48,11 +47,11 @@ func getInformation(url string) Paper {
 	p = p.filterInfo(paperParsed)
 	p = p.filterVariation(paperVariation)
 
-	p.url = url
+	p.URL = url
 
-	defer resp.Body.Close()
-	// c <- *p
 	fmt.Printf("Papel: %v\n", p)
+	// c <- *p
+	defer resp.Body.Close()
 	return *p
 }
 
@@ -72,7 +71,7 @@ func (p *Paper) filterVariation(paperParsed [][]string) *Paper {
 			switch prop {
 			case "Dia":
 				if strings.Contains(paperParsed[i+1][3], "%") {
-					p.dailyVariation = paperParsed[i+1][3]
+					p.DailyVariation = paperParsed[i+1][3]
 					isDone = true
 					break
 				}
@@ -98,35 +97,18 @@ func (p *Paper) filterInfo(paperParsed [][]string) *Paper {
 		if contain {
 			switch prop {
 			case "Papel":
-				p.name = paperParsed[i+1][2]
+				p.Name = paperParsed[i+1][2]
 				break
 			case "Empresa":
-				p.company = paperParsed[i+1][2]
+				p.Company = paperParsed[i+1][2]
 				break
 			case "Valor de mercado":
 				s, _ := strconv.ParseFloat(strings.Replace(paperParsed[i+1][2], ".", "", -1), 64)
-				p.marketValue = s
+				p.MarketValue = s
 				isDone = true
 				break
 			}
 		}
 	}
 	return p
-}
-
-// Get all Papers from base site
-// @Returning [] string PapersUrls
-func getPapersLinks() []string {
-	resp, e := http.Get(LINK)
-	if e != nil {
-		fmt.Println("Err", e)
-	}
-
-	papers, _ := util.MatchPage(resp, `<td><a.*?href="?(=?.*?)\s?"?>.*?</a></td>`)
-	papersUrls := make([]string, 0)
-
-	for _, Paper := range papers {
-		papersUrls = append(papersUrls, URLBASE+string(Paper[1]))
-	}
-	return papersUrls
 }
